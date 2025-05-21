@@ -1,23 +1,19 @@
-1.WE USE MONOLITHIC ARCHITECTURE IN THIS PROJECT   
-2.OUR REAL TIME WORK AS A DEVOPS ENGINEER WILL START WITH CREATING INFRA  
-3. FOR INFRA CREATION WE USE TERRAFORM IN OUR COMPANY  
-4. WE USE MODULES TO CREATE 3 TIER ARCHITECTURE IN AWS CLOUD  
-5. ONCE INFRA GOT CREATED WE CONFIGURE THE SERVERS USING ANSIBLE  
-6. WE INSTALL SOFTWARES ON WEB, APP, DB SERVERS BY USING PLAYBOOKS  
-7. WE CREATE ROLES AND WE EXECUTE THEM WHENEVER WE WANT    
-8. OUR DEVELOPMENT TEAM WILL PUSH THE CODE TO GITHUB WE INTEGRATE CODE FROM GITHUB TO JENKINS  
-9. IN JENKINS WE DO CONTINUOUS INTEGRATION (BUILD + TEST) AS RESULT WE GET ARTIFACT(.WAR FILE)  
-10. WE STORE ARTIFACTS ON S3 BUCKETS FOR ROLLBACK PURPOSE  
-11. WE RUN THE PIPELINE THAT WILL DEPLOY THE APPLICATION AUTOMATICALLY TO THE DEV SERVERS  
-12. AFTER DEV WE DEPLOY ON TEST AND UAT IF EVERY THING IS FINE WE DEPLOY THE APPLICATION TO PROD    
-13. AFTER DEPLOYING THE APPLICATION, WE VERIFY THE APPLICATION IS RUNNING OR NOT FROM ELB DNS  
-14. FINALLY ONCE EVERYTHING IS DONE WE MONITOR THE SERVERS FROM GRAFANA  
+1.We use monolithic architecture in our project.    
+2.So as a Devops engineer, need to create infrastructure.     
+3.For Infrastructure creation we use terraform. And by using terraform modules, 3 tier architecture is built in AWS Cloud.   
+4.Servers are configured using ansible and softwares are installed on web, app and db servers using playbooks.  
+5.Also roles are being created and executed when required.      
+6.And development team will push the code to Github and we integrate code from github to jenkins.    
+7.In jenkins we perform continuous integration(Build+Test) and as a result we get .war/.jar file(artifact).   
+8.And artifact is being stored in S3 bucket for rollback purpose.  
+9.We run pipeline that will deploy code to Dev server automatically, later deployed in Test and UAT. If everything is fine, deployed in Prod.  
+10.Once application is deployed, through ELB DNS application, state is checked whethere application is running or not and monitored from Grafana.  
   
-TOOLS:  
-CLOUD		         : AWS  
-INFRA		         : TERRAFORM  
-CODE		         : GIT & GITHUB  
-CI	      	     : JENKINS  
-CONFIG MANAGEMENT: ANSIBLE  
-MONITORING 	     : PROMETHEUS & GARFANA  
-APP SERVER	     : TOMCAT  
+Tools used in this project:  
+Cloud 	                : AWS    
+Infrastructure creation : Terraform     
+Code	                  : Git & Github      
+Continuous integration  : Jenkins      
+Configuration management: Ansible      
+Monitoring	            : Prometheus & Grafana     
+Aplication server       : Tomcat      
