@@ -1,0 +1,12 @@
+vpc_cidr =
+vpc_enable_dns_hostname =
+vpc_name =
+igw =
+pubsub_cidr =
+map_pub_ip =
+pubsub_name = 
+privsub_cidr =
+privsub_name =
+pub_rt_name =
+priv_rt_name =
+sg_name =
