@@ -1,4 +1,4 @@
-1.We use monolithic architecture in our project.    
+**We use monolithic architecture in our project.**  
 2.So as a Devops engineer, need to create infrastructure.     
 3.For Infrastructure creation we use terraform. And by using terraform modules, 3 tier architecture is built in AWS Cloud.   
 4.Servers are configured using ansible and softwares are installed on web, app and db servers using playbooks.  
