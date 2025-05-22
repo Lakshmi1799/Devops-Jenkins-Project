@@ -1,3 +1,9 @@
+# [Devops-Jenkins-Project](https://github.com/Lakshmi1799/Devops-Jenkins-Project.git)
+
+> A devops jenkins project with the use of jenkins, ansible, kubernetes, tomcat, aws
+
+
+
 **We use monolithic architecture in our project.**  
 2.So as a Devops engineer, need to create infrastructure.     
 3.For Infrastructure creation we use terraform. And by using terraform modules, 3 tier architecture is built in AWS Cloud.   
