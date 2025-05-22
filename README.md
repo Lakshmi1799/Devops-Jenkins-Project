@@ -3,24 +3,26 @@
 > A devops jenkins project with the use of jenkins, ansible, kubernetes, tomcat, aws
 > Monolithic architechture is used in this project
 
+![Architecture](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fsanjana-s-g-0b0001273_devops-jenkins-ansible-activity-7272953618905899010-JI60&psig=AOvVaw1k3S_4oxQjzTSErsOa-JEG&ust=1747992829011000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLDtre_ito0DFQAAAAAdAAAAABAE)
+
 ## Overview
 
 ### Creating the Infra using Terraform
 
 > Inorder to create the infra such as ec2 instances and vpc, we can run the terraform code.
+> Terraform modules is used to create infra.
+> 3 tier architecture is built in AWS Cloud.
 
 ```tf
  provider "aws" {
  region = var.inst_region
  }
-
  module "ec2" {
  source = "./module/ec2"
-}
-
+ }
  module "vpc" {
  source = "./module/vpc"
-}
+ }
 ```
 
 To provision the infrastructure using terraform,
@@ -32,69 +34,14 @@ To provision the infrastructure using terraform,
 > terraform output
 ```
 
+### Servers are configured using ansible
 
-### 1. Setup CI/CD with Jenkins, Git, Maven and Tomcat
-
-- Setup Jenkins
-- Run a test job
-- Setup & configure Maven and Git
-- Setup Tomcat Server
-- Installing additional required plugins
-- Integrating Git, Maven in Jenkins job
-- Run CI/CD job
-
-<details>
-  <summary>Architecture</summary>
-  <img src="./docs/1.png"/>
-</details>
-
-### 3. Integration with Ansible
-
-- Setting up Ansible environment
-- Integrating Ansible with Jenkins
-- Writing a Ansible playbook to deploy on container
-- Run a job
-
-<details>
-  <summary>Architecture</summary>
-  <img src="./docs/3.png"/>
-</details>
-
-## What is CI/CD ?
-
-- Continuos Integration (CI)
-- Continuos Delivery (CD) - There will be a manual intervention to deploy to env
-- Continuos Deployment (CD) - No manual intervention
-- CI process with result in an artifact which is used in the staging env.
-
-<details>
-  <summary>CI/CD Architecture</summary>
-  <img src="./docs/5.png"/>
-</details>
-
-- If this whole process happens without any manual intervention then its continuos deployment.
-  
-<details>
-  <summary>Continuous deployment Architecture</summary>
-  
-  <img src="./docs/6.png"/>
-  <img src="./docs/7.png"/>
-</details>
-
-## Jenkins Deploy on EC2/VM
-
-- Jenkins pulls the code from git and deploys the code to EC2 instance running tomcat.
-
-<details>
-  <summary>EC2 Architecture</summary>
-  <img src="./docs/9.png"/>
-</details>
+- softwares are installed on web, app and db servers using playbooks.
+- Also roles are being created and executed when required
 
 ### Jenkins Installation
 
-> The whole documentation for installation can be found [here](jenkins/01.jenkins_installation.MD)
-
-- Go into aws console and create an EC2 instance
+- Go into aws console and server
 - We can use `MobaXterm` or PuTTy to connect to the server, but we don't need to convert the key when using with `MobaXTerm`
 
 <details>
@@ -130,186 +77,30 @@ http://YOUR-SERVER-PUBLIC-IP:8080
 > echo $JAVA_HOME #copy the path
 ```
 
-
 ### Creating a Job
 
-- Go to `New Item` > `Jobs` > Give it a name
-- Give some description and for now the source code is `none` since we haven't installed any source code management plugins.
-- Build select `execute shell` because our target system is `ubuntu`
-- We can `Apply` > `Save`
-- If we need to edit it again we can press configure else we can do an initial build.
+- Go to `New Item` > select `Pipeline Jobs` > Give it a name
 
-### Github Setup
+### Writing pipeline script
 
-> Read documentation on [github jenkins setup](./notes/jenkins/Git_plugin_install.MD).
+- The pipeline script can be found in [pipeline script](https://github.com/Lakshmi1799/Devops-Jenkins-Project/blob/c5593aca5beec5604330712470f9cb0a83b1e18f/Pipeline)
 
-- The first step of installation can be skipped if we use terraform code to spin up the ec2 instance.
+### Setup CI/CD with Jenkins, Git, Maven and Tomcat
 
-### Maven Setup
-
-> Read documentation on [maven setup](./notes/jenkins/maven_install.MD).
-
-- Sometimes in ubuntu the maven home would be `/usr/share/maven`
-- Now, lets create a new item. `MyFirstMavenBuild` > Select `Maven Project`
-- To build with maven we need to have source code. Get the git clone url `https://github.com/murshidazher/simple-devops-hello-world.git` of the source code.
-- Choose git and provide the repository url.
-- Goals: `clean install package`
-- Apply and save
-- Build now
-- Workspace will contain all the files of the repo and the build maven war file can be found in `webapp > target > webapp.war`
-- You can find then locally under `cd /var/lib/jenkins/workspace`
-- Though we have a war file, we currently don't have any `target environment` to host these files. So we need to setup a tomcat server to host the war file.
-
-## Integrating Tomcat server in pipeline
-
-### Install Tomcat
-
-> Read documentation on [how to setup a tomcat server](./notes/tomcat/01.tomcat_installation.MD).
-
-- We need to create a new `ec2` instance to host the tomcat server.
-- We also need to create users so that tomcat server will allows jenkins server to host the war file. So we need to create couple of users and roles.
-
-```sh
-> cd terraform/tomcat-server/config
-> AWS_DEFAULT_REGION=us-east-1 aws ec2 create-key-pair --key-name tomcat --query 'KeyMaterial' --output text > tomcat.pem
-> chmod 400 tomcat.pem
-```
-
-To provision the infrastructure using terraform,
-
-```sh
-> terraform init
-> terraform plan 
-> terraform apply -auto-approve
-> terraform refresh
-> terraform output
-```
-
-- Login to the instance and setup the necessary port numbers.
-- We need to also add some users in `context.xml` so users can log into the `ManagerApp` tomcat server from outside.
-- `find / -name context.xml` and edit the files under `webapps`.
-
-### Integrate Tomcat server with Jenkins
-
-- We need to integrate tomcat server with jenkins for deployment.
-- Go to the jenkins serve and to install on vm we need an additional plugin called `deploy to container`. So we need to install it.
-- Create a new job to deploy to vm > `new item` > `deploy_on_tomcat_server` > `maven project`
-- Choose git and give the repository url. Select `main` branch.
-- Goals: `clean install package`
-- Since we need to deploy it once successful, we need to add `post-build action` > `deploy war/ear to a container`  > give the war file location > `**/*.war`
-- Select `add to container` > `tomcat v8` > to deploy to tomcat server it should accept jenkins credentials. Since we created couple of users we can use those users.
-- Give the `deployer` credential and add the tomcat url `http://x.xx.xx.x:8080/` > Apply > Save
-- Run the job by pressing `Build now`.
-- So now when we run this job it will deploy the war file to tomcat server. The jenkins will copy the files to `/opt/tomcat/webapps/` directory.
-- To access the application we need to give the war file name. i.e. `http://x.xx.xx.x:8080/webapp`
-
-### Automatic Deploy on Code change
-
-> How to automatically trigger a new build on code change ?
-
-- Edit `deploy_on_tomcat_server` and configure
-- Scroll down and then `Build trigger` section, if we specify `build periodically` then we need to add a cron job.
-- `PollSCM` also is like cron job where it will fetch the repository periodically. If there wasnt any changes during that period of time, then it wont trigger that job. `* * * * *` - every minute, every hour, every day, every week, every month it should get executed. If you need to execute once a day around 12'o clock `00 12 * * *`
-- Now if we push a code change, it will be automatically triggered.
-- Here we are using jenkins as build and deployment tool.
-
-### Deploying a war file on Docker container using Jenkins
-
-- Create a new job in jenkins server `deploy_on_container` > copy from: `deploy_on_docker`
-- Change post build actions, `exec command`
-
-```sh
-cd /home/dockeradmin; 
-docker build -t devops-image .;
-docker run -d --name devops-container -p 8080:8080 devops-image;
-```
-
-### Limitation of Jenkins as Deployment tool
-
-> Use `ansible` as deployment tool while `jenkins` as build tool.
-
-- Jenkins cant be used as a full-fledged deployment tools for example if the war file is already available then the file is going to fail.
-- So to overcome these problems we're going to use `ansible` as our deployment tool.
-- If you have 100s of deployment location then its a difficult task for jenkins. These kind of problem are hectic to handle with jenkins.
-- Hence we're only going to use jenkins as a `build tool` not a deployment tool.
-
-## Integrating Ansible in pipeline
-
-Now we will integrate ansible to the pipeline, so we can deploy on docker.
+- Setup Jenkins
+- Write pieline script
+- Setup & configure Maven and Git
+- Setup Tomcat Server
+- Installing additional required plugins
+- Integrating Git, Maven in Jenkins job
+- Run CI/CD job
 
 <details>
-  <summary>Integrating Ansible Architecture</summary>
-  <img src="./docs/3.png"/>
+  <summary>Architecture</summary>
+  <img src="./docs/1.png"/>
 </details>
 
-### Ansible Environment Setup
-
-> Read documentation on [how to setup an ansible environment](./notes/ansible/Ansible_installation.MD).
-
-- We need to create a user called `ansadmin` to create and store docker images in registry.
-- Follow the rest of the instructions in the installation file.
-- We need to enable the password based authentication in docker server, `vi /etc/ssh/sshd_config`,
-
-```sh
-# EC2 use keys for remote access
-PasswordAuthentication yes
-```
-
-- change the hostname to make it easier to identify,
-
-```sh
-> hostname ansible-control-node
-> sudo su -
-```
-
-- In the docker host server too create an `ansadmin` user, use the same password used in ansible server,
-
-```sh
-> useradd ansadmin
-> passwd ansadmin # enter the password and remember it 
-``` 
-
-- Now we need to copy the `pem` keys from ansible server to docker host ec2 server.
-
-```sh
-# in ansible ec2
-> sudo - ansadmin
-> ssh-copy-id ansadmin@<docker-ec2-ip> # provide the password for first time
-> ssh-copy-id localhost # so it copies the key under localhost
-> ssh ansadmin@<docker-ec2-ip> # now will be able to login to target system
-> exit
-```
-
-- We will create a folder for the files, we add permission so that it doesnt give an permission issue when copying the files.
-
-```sh
-> cd /opt
-> mkdir docker
-> sudo chown -R ansadmin:ansadmin /opt/docker # give full access to the folder
-> ls -l /opt
-```
-
-- Now will create a `host` file to check the connectivity. 
-
-```sh
-> cd /etc/ansible
-> sudo vi hosts
-```
-
-```txt
-<add-docker-host-ip>
-localhost
-```
-
-- Lets do a build test,
-
-```sh
-> ansible all -m ping
-```
-
 ### Integrate Ansible with Jenkins
-
-> Create an ansible job in jenkins, look into this [documentation](./notes/jenkins_jobs/Deploy_on_Container_using_Ansible.MD).
 
 - Go into the jenkins control > `manage jenkins` > `configure system`
 - similar to docker host in publish over SSH add a new config
@@ -325,89 +116,93 @@ localhost
   - Remote directory: `//opt/docker`
   - Exec command: ``
 - `Build now`
-- We also need to create a Dockerfile in the ansible server so that we can create the docker image.
 
-### Create an Ansible Playbook
+## Integrating Ansible in pipeline
 
-- Login to the ansible server
-- Copy over same dockerfile to `/opt/docker` in the `ansible-host` server.
-- Then we will write an ansible playbook to automate the creation of docker image.
-- create a file called `simple-devops-image.yml`, refer this file [create-docker-image.yml](notes/jenkins_jobs/create-docker-image.yml)
-  - `become: true` makes root privileges
-  - `chdir` go inside this folder.
-- create a local host file to create the docker image locally, `vi hosts` > add `localhost`
-- `--check` flag will show you how the playbook is going to be executed
+Now we will integrate ansible to the pipeline, so we can deploy on servers.
 
-```sh
-> ansible-playbook -i hosts simple-devops-image.yml --check
-> ansible-playbook -i hosts simple-devops-image.yml
-> docker images
+### Create an Ansible playbook to deploy application on servers
+
+- Writing a Ansible playbook to deploy on servers
+
+```yaml
+---
+- hosts: all
+  tasks:
+
+    - name: task1
+      copy:
+        src: /var/lib/jenkins/workspace/pipeline/target/NETFLIX-1.2.2.war
+        dest: /root/tomcat/webapps
+...
 ```
 
-- we can create another playbook or use the same yml file to create a container, [create-docker-container.yml](notes/jenkins_jobs/create-docker-container.yml)
+### Integrate Tomcat server with Jenkins
 
-```sh
-> ansible-playbook -i hosts create-docker-container.yml --check
-> ansible-playbook -i hosts create-docker-container.yml
-> docker ps -a
-```
+- We need to integrate tomcat server with jenkins for deployment.
+- Go to the jenkins serve and to install on vm we need an additional plugin called `deploy to container`. So we need to install it.
+- Since we need to deploy it once successful, we need to add `post-build action` > `deploy war/ear to a container`  > give the war file location > `**/*.war`
+- Select `add to container` > `tomcat v8` > to deploy to tomcat server it should accept jenkins credentials. Since we created couple of users we can use those users.
+- Give the `deployer` credential and add the tomcat url `http://x.xx.xx.x:8080/` > Apply > Save
+- Run the job by pressing `Build now`.
+- So now when we run this job it will deploy the war file to tomcat server. The jenkins will copy the files to `/opt/tomcat/webapps/` directory.
+- To access the application we need to give the war file name. i.e. `http://x.xx.xx.x:8080/webapp`
 
-### Run Ansible Playbook from Jenkins
+## What is CI/CD ?
 
-- Before running the playbook from jenkins, remove all the containers,
+- Continuos Integration (CI) - It refers to Build + Test. As a result .war file will be generated.
+- Continuos Delivery (CD) - There will be a manual intervention to deploy to env
+- Continuos Deployment (CD) - No manual intervention
+- CI process with result in an artifact which is used in the staging env.
 
-```sh
-> docker ps -a
-> docker rm <id>
-> docker images
-> docker rmi simple-docker-image tomcat
-```
+<details>
+  <summary>CI/CD Architecture</summary>
+  <img src="./docs/5.png"/>
+</details>
 
-- Go to ansible dashboard > edit the job `deploy_on_container_using_ansible` > `configure`
-- Go to exec command;
-
-```sh
-> ansible-playbook -i /opt/docker/hosts /opt/docker/simple-devops-image.yml;
-> ansible-playbook -i /opt/docker/hosts /opt/docker/create-docker-container.yml;
-```
-
-- Apply > Save > build now
-- When the job is done `http://<ip-address-of-ansible>:8080/webapp` will be hosted currently in the ansible server.
-- If we run the job the second time it will fail because we cant create two container with the same name. To overcome this problem we need to remove the existing container before creating a new container.
-- Create a new playbook called [simple-docker-project.yml](notes/jenkins_jobs/simple-docker-project.yml). `Ignore error: yes` meaning that if there is no running container it wont throw an error.
-- change the exec command in the job,
-
-```sh
-> ansible-playbook -i /opt/docker/hosts /opt/docker/simple-docker-project.yml;
-```
-
-
-
+- If this whole process happens without any manual intervention then its continuos deployment.
   
+<details>
+  <summary>Continuous deployment Architecture</summary>
+  
+  <img src="./docs/6.png"/>
+  <img src="./docs/7.png"/>
+</details>
+
+### Artifact storage
+- The source code which undergoes build and test is found at [source code](https://github.com/Lakshmi1799/Devops-Jenkins-Project/tree/c5593aca5beec5604330712470f9cb0a83b1e18f/java)
+- The generated .war/.jar file(artifact) are stored in S3 bucket or in JFrog artifactory.
+- In the current project, artifact is stored in S3 bucket.
+
+## Jenkins Deploy on EC2/VM
+
+- Jenkins pulls the code from git and deploys the code to EC2 instance running tomcat.
+
+<details>
+  <summary>EC2 Architecture</summary>
+  <img src="./docs/9.png"/>
+</details>
 
 
-### Integrating Jenkins CI/CD job to deploy on k8s
+### Automatic Deploy on Code change
 
-> We will integrate CD job as a downstream job of CI. So that whenever the CI is executed and if its successful then it will execute the CD job.
+> How to automatically trigger a new build on code change ?
 
-- Go to the `deploy_on_kubernetes_ci` job > `configure`
-- Go to `post-build actions` > Add new post buid action > `Build other projects` > select `deploy_on_kubernetes_cd` > trigger only if the build is stable
-- Apply > Save
-
-💡 Though this job make ci and cd, the cd wont be triggered until we enable versioning for the image so that it knows the image has changed. This will be done by changing the `valaxy-deplo.yml` script manually or adding `rollout` functionality in the `valaxy-deplo.yml` script.
-
-## License
-
-[MIT](LICENSE) © 2021 Murshid Azher
+- In the pipeline job,
+- Scroll down and then `Build trigger` section, if we specify `build periodically` then we need to add a cron job.
+- `PollSCM` also is like cron job where it will fetch the repository periodically. If there wasnt any changes during that period of time, then it wont trigger that job. `* * * * *` - every minute, every hour, every day, every week, every month it should get executed. If you need to execute once a day around 12'o clock `00 12 * * *`
+- Now if we push a code change, it will be automatically triggered.
+- Here we are using jenkins as build and deployment tool.
 
 
+### Limitation of Jenkins as Deployment tool
+
+> Use `ansible` as deployment tool while `jenkins` as build tool.
+
+- Jenkins cant be used as a full-fledged deployment tools for example if the war file is already available then the file is going to fail.
+- So to overcome these problems we're going to use `ansible` as our deployment tool.
+- If you have 100s of deployment location then its a difficult task for jenkins. These kind of problem are hectic to handle with jenkins.
+- Hence we're only going to use jenkins as a `build tool` not a deployment tool.
 
 
-Tools used in this project:  
-Cloud 	                : AWS    
-Infrastructure creation : Terraform     
-Code	                  : Git & Github      
-Continuous integration  : Jenkins      
-Configuration management: Ansible      
-Monitoring	            : Prometheus & Grafana     
-Aplication server       : Tomcat      
+
