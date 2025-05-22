@@ -1,6 +1,6 @@
 # [Devops-Jenkins-Project](https://github.com/Lakshmi1799/Devops-Jenkins-Project.git)
 
-> A devops jenkins project with the use of jenkins, ansible, kubernetes, tomcat, aws
+> A devops jenkins project with the use of jenkins, ansible, kubernetes, tomcat, aws  
 > Monolithic architechture is used in this project
 
 ![Architecture](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.linkedin.com%2Fposts%2Fsanjana-s-g-0b0001273_devops-jenkins-ansible-activity-7272953618905899010-JI60&psig=AOvVaw1k3S_4oxQjzTSErsOa-JEG&ust=1747992829011000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCLDtre_ito0DFQAAAAAdAAAAABAE)
