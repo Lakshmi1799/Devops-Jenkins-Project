@@ -45,11 +45,6 @@ To provision the infrastructure using terraform,
 - Go into aws console and server
 - We can use `MobaXterm` or PuTTy to connect to the server, but we don't need to convert the key when using with `MobaXTerm`
 
-<details>
-  <summary>Jenkins Architecture</summary>
-  <img src="./docs/8.png"/>
-</details>
-
 ```sh
 > sudo su - # be the root user
 > java -version # we need 1.8
@@ -89,17 +84,12 @@ http://YOUR-SERVER-PUBLIC-IP:8080
 ### Setup CI/CD with Jenkins, Git, Maven and Tomcat
 
 - Setup Jenkins
-- Write pieline script
+- Write pipeline script
 - Setup & configure Maven and Git
 - Setup Tomcat Server
 - Installing additional required plugins
 - Integrating Git, Maven in Jenkins job
 - Run CI/CD job
-
-<details>
-  <summary>Architecture</summary>
-  <img src="./docs/1.png"/>
-</details>
 
 ### Integrate Ansible with Jenkins
 
@@ -143,32 +133,11 @@ Now we will integrate ansible to the pipeline, so we can deploy on servers.
 - We need to integrate tomcat server with jenkins for deployment.
 - Go to the jenkins serve and to install on vm we need an additional plugin called `deploy to container`. So we need to install it.
 - Since we need to deploy it once successful, we need to add `post-build action` > `deploy war/ear to a container`  > give the war file location > `**/*.war`
-- Select `add to container` > `tomcat v8` > to deploy to tomcat server it should accept jenkins credentials. Since we created couple of users we can use those users.
-- Give the `deployer` credential and add the tomcat url `http://x.xx.xx.x:8080/` > Apply > Save
+- Select `add to container` > `tomcat v8` > to deploy to tomcat server it should accept jenkins credentials. 
+- Give the tomcat credentials and add the tomcat url `http://x.xx.xx.x:8080/` > Apply > Save
 - Run the job by pressing `Build now`.
-- So now when we run this job it will deploy the war file to tomcat server. The jenkins will copy the files to `/opt/tomcat/webapps/` directory.
-- To access the application we need to give the war file name. i.e. `http://x.xx.xx.x:8080/webapp`
-
-## What is CI/CD ?
-
-- Continuos Integration (CI) - It refers to Build + Test. As a result .war file will be generated.
-- Continuos Delivery (CD) - There will be a manual intervention to deploy to env
-- Continuos Deployment (CD) - No manual intervention
-- CI process with result in an artifact which is used in the staging env.
-
-<details>
-  <summary>CI/CD Architecture</summary>
-  <img src="./docs/5.png"/>
-</details>
-
-- If this whole process happens without any manual intervention then its continuos deployment.
-  
-<details>
-  <summary>Continuous deployment Architecture</summary>
-  
-  <img src="./docs/6.png"/>
-  <img src="./docs/7.png"/>
-</details>
+- So now when we run this job it will deploy the war file to tomcat server. The ansible will copy the files to `/root/tomcat/webapps/` directory.
+- To access the application we need to give the war file name. i.e. `http://x.xx.xx.x:8080/netflix`
 
 ### Artifact storage
 - The source code which undergoes build and test is found at [source code](https://github.com/Lakshmi1799/Devops-Jenkins-Project/tree/c5593aca5beec5604330712470f9cb0a83b1e18f/java)
@@ -179,12 +148,6 @@ Now we will integrate ansible to the pipeline, so we can deploy on servers.
 
 - Jenkins pulls the code from git and deploys the code to EC2 instance running tomcat.
 
-<details>
-  <summary>EC2 Architecture</summary>
-  <img src="./docs/9.png"/>
-</details>
-
-
 ### Automatic Deploy on Code change
 
 > How to automatically trigger a new build on code change ?
@@ -194,16 +157,3 @@ Now we will integrate ansible to the pipeline, so we can deploy on servers.
 - `PollSCM` also is like cron job where it will fetch the repository periodically. If there wasnt any changes during that period of time, then it wont trigger that job. `* * * * *` - every minute, every hour, every day, every week, every month it should get executed. If you need to execute once a day around 12'o clock `00 12 * * *`
 - Now if we push a code change, it will be automatically triggered.
 - Here we are using jenkins as build and deployment tool.
-
-
-### Limitation of Jenkins as Deployment tool
-
-> Use `ansible` as deployment tool while `jenkins` as build tool.
-
-- Jenkins cant be used as a full-fledged deployment tools for example if the war file is already available then the file is going to fail.
-- So to overcome these problems we're going to use `ansible` as our deployment tool.
-- If you have 100s of deployment location then its a difficult task for jenkins. These kind of problem are hectic to handle with jenkins.
-- Hence we're only going to use jenkins as a `build tool` not a deployment tool.
-
-
-
