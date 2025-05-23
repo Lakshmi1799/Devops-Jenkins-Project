@@ -1,7 +1,7 @@
 # [Devops-Jenkins-Project](https://github.com/Lakshmi1799/Devops-Jenkins-Project.git)
 
-> A devops jenkins project with the use of jenkins, ansible, kubernetes, tomcat, aws  
-> Monolithic architechture is used in this project
+> A devops jenkins project with the use of jenkins, ansible, kubernetes, tomcat and aws .  
+> Monolithic architechture is used in this project.
 
 ![image](https://github.com/user-attachments/assets/7a420473-2229-43f5-a6c8-25286ab45933)
 
@@ -37,13 +37,13 @@ To provision the infrastructure using terraform,
 
 ### Servers are configured using ansible
 
-- softwares are installed on web, app and db servers using playbooks.
-- Also roles are being created and executed when required
+- Softwares are installed on web, app and db servers using playbooks.
+- Also roles are being created and executed when required.
 
 ### Jenkins Installation
 
-- Go into aws console and server
-- We can use `MobaXterm` or PuTTy to connect to the server, but we don't need to convert the key when using with `MobaXTerm`
+- Go into aws console and server.
+- We can use `MobaXterm` or PuTTy to connect to the server, but we don't need to convert the key when using with `MobaXTerm`.
 
 ```sh
 > sudo su - # be the root user
@@ -53,7 +53,7 @@ To provision the infrastructure using terraform,
 ```
 
 - We need to download LTS (Long Term Support) version of redhat and fedora version.
-- Access jenkins in the browser
+- Access jenkins in the browser.
 
 ```sh
 http://YOUR-SERVER-PUBLIC-IP:8080
@@ -94,20 +94,14 @@ http://YOUR-SERVER-PUBLIC-IP:8080
 ### Integrate Ansible with Jenkins
 
 - Go into the jenkins control > `manage jenkins` > `configure system`
-- similar to docker host in publish over SSH add a new config
+- similar to host in publish over SSH add a new config
   - `Name` : `ansible-server`
-  - `Hostname`: give the ip address of ansible host `ip addr` without `/32`
+  - `Hostname`: give the ip address of ansible host `ip addr`
   - `username`: `ansadmin`
   - `Advance` > use password authentication checkbox
   - `password`: `give the ansadmin password` and test configuration
   - `apply` > `save`
-- Create a job > `deploy_on_container_using_ansible` > copy from: `deploy_on_container`
-  - Enable `PollSCM` > `* * * * *`
-  - SSH Name: `ansible-server`
-  - Remote directory: `//opt/docker`
-  - Exec command: ``
-- `Build now`
-
+- we ansible worker nodes with jenkins
 ## Integrating Ansible in pipeline
 
 Now we will integrate ansible to the pipeline, so we can deploy on servers.
@@ -151,9 +145,7 @@ Now we will integrate ansible to the pipeline, so we can deploy on servers.
 ### Automatic Deploy on Code change
 
 > How to automatically trigger a new build on code change ?
-
-- In the pipeline job,
-- Scroll down and then `Build trigger` section, if we specify `build periodically` then we need to add a cron job.
+- In the pipeline job, Scroll down and then `Build trigger` section, if we specify `build periodically` then we need to add a cron job.
 - `PollSCM` also is like cron job where it will fetch the repository periodically. If there wasnt any changes during that period of time, then it wont trigger that job. `* * * * *` - every minute, every hour, every day, every week, every month it should get executed. If you need to execute once a day around 12'o clock `00 12 * * *`
 - Now if we push a code change, it will be automatically triggered.
 - Here we are using jenkins as build and deployment tool.
